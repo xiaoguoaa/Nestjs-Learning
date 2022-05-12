@@ -65,6 +65,13 @@ export class CatService {
     }
 
     /**
+     * 查询列表
+     */
+    async findAllCat(): Promise<Cat[]> {
+        return this.catRepo.find();
+    }
+
+    /**
      * 根据ID查询单个信息，如果不存在则抛出404异常
      * @param id ID
      */

@@ -1,10 +1,11 @@
 {
-    "type": "postgres",
+    "name": "default",
+    "type": "mysql",
     "host": "localhost",
-    "port": 5432,
-    "username": "postgres",
-    "password": "123456",
-    "database": "test",
+    "port": 3306,
+    "username": "root",
+    "password": "windows@973886860",
+    "database": "mysql",
     "entities": [
         "src/**/**.entity{.ts,.js}"
     ],

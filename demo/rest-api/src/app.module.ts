@@ -13,6 +13,7 @@ import { ErrorsInterceptor } from './common/errors.interceptor';
 @Module({
     // TypeOrmModule.forRoot() 默认加载项目根目录下的 ormconfig.json 配置文件用于配置数据库连接
     // TypeORM 配置文件详细文档 https://typeorm.io/#/using-ormconfig
+    // imports: [TypeOrmModule.forRoot(), CatModule],  // 导入其他模块的集合
     imports: [TypeOrmModule.forRoot(), CatModule],  // 导入其他模块的集合
     controllers: [AppController],  // 当前模块的控制器集合
     providers: [
@@ -24,4 +25,5 @@ import { ErrorsInterceptor } from './common/errors.interceptor';
     ],  // 当前模块的提供者集合
     exports: [], // 导出当前模块的提供者，用于被其他模块调用
 })
+
 export class AppModule { }

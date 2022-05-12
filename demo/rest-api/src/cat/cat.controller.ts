@@ -33,4 +33,10 @@ export class CatController {
         const data = await this.catService.findOneCat(id);
         return { code: 200, message: '查询成功', data };
     }
+
+    @Get()
+    async findAllCat(): Promise<Result> {
+        const data = await this.catService.findAllCat();
+        return { code: 200, message: '查询成功', data };
+    }
 }
