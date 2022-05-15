@@ -5,7 +5,7 @@
     "port": 3306,
     "username": "root",
     "password": "windows@973886860",
-    "database": "mysql",
+    "database": "todos",
     "entities": [
         "src/**/**.entity{.ts,.js}"
     ],
