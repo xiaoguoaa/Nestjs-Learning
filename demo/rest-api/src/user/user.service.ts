@@ -12,24 +12,18 @@ export class UserAndCode extends User {
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(User) private readonly UserRepo: Repository<User> // 使用泛型注入对应类型的存储库实例
+    @InjectRepository(User) private readonly UserRepo: Repository<User>, // 使用泛型注入对应类型的存储库实例
+    @InjectRepository(VerificationCode) private readonly CodeRepo: Repository<VerificationCode> // 使用泛型注入对应类型的存储库实例
   ) {}
 
-  async register(user: UserAndCode): Promise<User> {
-    const findCode = await getConnection()
-      .createQueryBuilder()
-      .select("code")
-      .from(VerificationCode, "vc")
-      .where("vc.email = :email", { email: user.email })
-      .getOne();
-    console.log("user", user);
-    console.log("findCode", findCode);
+  async register(user: UserAndCode): Promise<boolean> {
+      const findCode = await this.CodeRepo.findOne({ email: user.email });
     if (
       !user.code ||
       !findCode ||
       findCode.code.toLocaleLowerCase() !== user.code.toLocaleLowerCase()
     ) {
-      throw new HttpException("验证码错误", 500);
+      throw new HttpException("验证码错误", 200);
     }
 
     delete user.id;
@@ -37,13 +31,22 @@ export class UserService {
 
     let findUser = await this.UserRepo.findOne({ nickname: user.nickname });
     if (findUser) {
-      throw new HttpException("该昵称已注册，请直接登录", 500);
-    }
-    findUser = await this.UserRepo.findOne({ email: user.email });
-    if (findUser) {
-      throw new HttpException("该邮箱已注册，请直接登录", 500);
+      throw new HttpException("该昵称已注册，请直接登录", 200);
     }
 
-    return this.UserRepo.save(this.UserRepo.create(user));
+    await this.UserRepo.save(this.UserRepo.create(user));
+    await this.CodeRepo.delete(findCode.id);
+
+    return true;
+  }
+
+  async login(user: User) {
+      let findUser = this.UserRepo.find({ nickname: user.nickname, password: user.password });
+      if (!findUser) {
+        findUser = this.UserRepo.find({ email: user.email, password: user.password });
+      }
+      if (!findUser) {
+        throw new HttpException("账号或密码错误，请重新登录", 200);
+      }
   }
 }
