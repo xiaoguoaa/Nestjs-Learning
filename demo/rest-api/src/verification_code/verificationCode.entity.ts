@@ -27,7 +27,8 @@ export class VerificationCode {
     code: string;
 
     @Column({
-        comment: '邮箱验证码'
+        comment: '邮箱验证码',
+        nullable: true
     })
     emailCode: string;
 }

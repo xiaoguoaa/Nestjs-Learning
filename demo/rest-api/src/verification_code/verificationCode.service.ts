@@ -12,6 +12,7 @@ import * as nodemailer from "nodemailer";
 
 import { randomCode } from "src/utils";
 import { VerificationCode } from "./verificationCode.entity";
+import { resolve } from "dns";
 
 @Injectable()
 export class VerificationCodeService {
@@ -27,7 +28,7 @@ export class VerificationCodeService {
       !findCode ||
       findCode.code.toLocaleLowerCase() !== emailObj.code.toLocaleLowerCase()
     ) {
-      throw new HttpException("验证码错误", 200);
+      throw new HttpException("邮箱或验证码错误", 500);
     }
 
     let transporter = nodemailer.createTransport({
@@ -42,24 +43,29 @@ export class VerificationCodeService {
       },
     });
 
+    let emailCode = randomCode(6);
+
     let mailOptions = {
-      from: '"sendUserName" <973886860@qq.com>', // sender address
+      from: '"飞来就我题红" <973886860@qq.com>', // sender address
       to: emailObj.email, // list of receivers
       subject: "注册验证码", // Subject line
-      html: `<b>${randomCode(6)}</b>`, // html body
+      html: `<b>注册验证码: <span style="color: #f66">${emailCode}</span></b>`, // html body
     };
-
     let result;
-    await transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        result = new HttpException("邮件发送错误", 500);
-      }
-      result = true;
+    await transporter.sendMail(mailOptions).then(async () => {
+      findCode.emailCode = emailCode;
+      await this.CodeRepo.save(findCode);
+    }).catch(() => {
+      throw new HttpException("邮件发送失败", 500);
     });
     return result;
   }
 
   async getCode(email: string): Promise<string> {
+    if (!email) {
+      throw new HttpException("这些参数必填: email", 500);
+    }
+
     var captcha = svgCaptcha.create({
       size: 4,
       background: "#5588aa",

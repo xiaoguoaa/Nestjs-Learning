@@ -23,13 +23,19 @@ export class UserService {
   ) {}
 
   async register(user: UserAndCode): Promise<boolean> {
+    if (!user.nickname || !user.email || !user.code || !user.password) {
+      throw new HttpException(
+        "这些参数必填: nickname、email、code、password",
+        200
+      );
+    }
     const findCode = await this.CodeRepo.findOne({ email: user.email });
     if (
       !user.code ||
       !findCode ||
       findCode.emailCode.toLocaleLowerCase() !== user.code.toLocaleLowerCase()
     ) {
-      throw new HttpException("注册验证码错误", 200);
+      throw new HttpException("注册验证码错误", 500);
     }
 
     delete user.id;
@@ -37,7 +43,7 @@ export class UserService {
 
     let findUser = await this.UserRepo.findOne({ nickname: user.nickname });
     if (findUser) {
-      throw new HttpException("该昵称已注册，请直接登录", 200);
+      throw new HttpException("该昵称已注册，请直接登录", 500);
     }
 
     await this.UserRepo.save(this.UserRepo.create(user));
@@ -47,18 +53,26 @@ export class UserService {
   }
 
   async login(user: User) {
-    let findUser = this.UserRepo.find({
+    if (!user.nickname || !user.password) {
+      throw new HttpException("这些参数必填: nickname、password", 200);
+    }
+
+    let findUser = await this.UserRepo.findOne({
       nickname: user.nickname,
       password: user.password,
     });
     if (!findUser) {
-      findUser = this.UserRepo.find({
-        email: user.email,
+      findUser = await this.UserRepo.findOne({
+        email: user.nickname,
         password: user.password,
       });
     }
     if (!findUser) {
       throw new HttpException("账号或密码错误，请重新登录", 200);
     }
+
+    delete findUser.password;
+
+    return findUser;
   }
 }
