@@ -1,6 +1,6 @@
 /*
- * @Descripttion: 
- * @version: 
+ * @Descripttion:
+ * @version:
  * @Author: guowh
  * @Date: 2022-05-24 09:41:01
  */
@@ -12,16 +12,26 @@ import * as nodemailer from "nodemailer";
 
 import { randomCode } from "src/utils";
 import { VerificationCode } from "./verificationCode.entity";
-import { resolve } from "dns";
+import { User } from "../user/user.entity";
 
 @Injectable()
 export class VerificationCodeService {
   constructor(
+    @InjectRepository(User) private readonly UserRepo: Repository<User>,
     @InjectRepository(VerificationCode)
     private readonly CodeRepo: Repository<VerificationCode> // 使用泛型注入对应类型的存储库实例
   ) {}
 
-  async getEmailCode(emailObj: { email: string, code: string }) {
+  async getEmailCode(emailObj: { email: string; code: string }) {
+    if (!emailObj.email || !emailObj.code) {
+      throw new HttpException("这些参数必填: email、code", 500);
+    }
+
+    const findUser = this.UserRepo.findOne({ email: emailObj.email });
+    if (findUser) {
+      throw new HttpException("该邮箱已注册，请直接登录", 500);
+    }
+
     const findCode = await this.CodeRepo.findOne({ email: emailObj.email });
     if (
       !emailObj.code ||
@@ -52,12 +62,15 @@ export class VerificationCodeService {
       html: `<b>注册验证码: <span style="color: #f66">${emailCode}</span></b>`, // html body
     };
     let result;
-    await transporter.sendMail(mailOptions).then(async () => {
-      findCode.emailCode = emailCode;
-      await this.CodeRepo.save(findCode);
-    }).catch(() => {
-      throw new HttpException("邮件发送失败", 500);
-    });
+    await transporter
+      .sendMail(mailOptions)
+      .then(async () => {
+        findCode.emailCode = emailCode;
+        await this.CodeRepo.save(findCode);
+      })
+      .catch(() => {
+        throw new HttpException("邮件发送失败", 500);
+      });
     return result;
   }
 
