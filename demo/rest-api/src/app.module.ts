@@ -1,12 +1,18 @@
+/*
+ * @Descripttion: 
+ * @version: 
+ * @Author: guowh
+ * @Date: 2022-05-11 22:39:01
+ */
 import { Module } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { CatModule } from './cat/cat.module';
-import { UserModule } from './user/user.module';
-import { ErrorsInterceptor } from './common/errors.interceptor';
+import { CatModule } from './modules/cat/cat.module';
+import { UserModule } from './modules/user/user.module';
+import { ErrorsInterceptor } from './modules/common/errors.interceptor';
 
 /**
  * @Module() 定义一个模块，并管理这个模块的导入集合、控制器集合、提供者集合、导出集合

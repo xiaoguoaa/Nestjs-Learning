@@ -9,7 +9,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
 import { User } from "./user.entity";
-import { VerificationCode } from "src/verification_code/verificationCode.entity";
+import { VerificationCode } from "src/modules/verification_code/verificationCode.entity";
 
 export class UserAndCode extends User {
   code?: string;
