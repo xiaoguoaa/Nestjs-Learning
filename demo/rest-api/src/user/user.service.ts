@@ -1,6 +1,12 @@
+/*
+ * @Descripttion:
+ * @version:
+ * @Author: guowh
+ * @Date: 2022-05-24 09:41:01
+ */
 import { Injectable, HttpException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, getConnection } from "typeorm";
+import { Repository } from "typeorm";
 
 import { User } from "./user.entity";
 import { VerificationCode } from "src/verification_code/verificationCode.entity";
@@ -8,22 +14,22 @@ import { VerificationCode } from "src/verification_code/verificationCode.entity"
 export class UserAndCode extends User {
   code?: string;
 }
-
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly UserRepo: Repository<User>, // 使用泛型注入对应类型的存储库实例
-    @InjectRepository(VerificationCode) private readonly CodeRepo: Repository<VerificationCode> // 使用泛型注入对应类型的存储库实例
+    @InjectRepository(VerificationCode)
+    private readonly CodeRepo: Repository<VerificationCode> // 使用泛型注入对应类型的存储库实例
   ) {}
 
   async register(user: UserAndCode): Promise<boolean> {
-      const findCode = await this.CodeRepo.findOne({ email: user.email });
+    const findCode = await this.CodeRepo.findOne({ email: user.email });
     if (
       !user.code ||
       !findCode ||
-      findCode.code.toLocaleLowerCase() !== user.code.toLocaleLowerCase()
+      findCode.emailCode.toLocaleLowerCase() !== user.code.toLocaleLowerCase()
     ) {
-      throw new HttpException("验证码错误", 200);
+      throw new HttpException("注册验证码错误", 200);
     }
 
     delete user.id;
@@ -41,12 +47,18 @@ export class UserService {
   }
 
   async login(user: User) {
-      let findUser = this.UserRepo.find({ nickname: user.nickname, password: user.password });
-      if (!findUser) {
-        findUser = this.UserRepo.find({ email: user.email, password: user.password });
-      }
-      if (!findUser) {
-        throw new HttpException("账号或密码错误，请重新登录", 200);
-      }
+    let findUser = this.UserRepo.find({
+      nickname: user.nickname,
+      password: user.password,
+    });
+    if (!findUser) {
+      findUser = this.UserRepo.find({
+        email: user.email,
+        password: user.password,
+      });
+    }
+    if (!findUser) {
+      throw new HttpException("账号或密码错误，请重新登录", 200);
+    }
   }
 }
