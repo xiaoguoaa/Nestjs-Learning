@@ -4,7 +4,7 @@
  * @Author: guowh
  * @Date: 2022-05-11 22:39:01
  */
-import { Module } from '@nestjs/common';
+import {Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -13,6 +13,7 @@ import { AppService } from './app.service';
 import { CatModule } from './modules/cat/cat.module';
 import { UserModule } from './modules/user/user.module';
 import { ErrorsInterceptor } from './modules/common/errors.interceptor';
+import { LoggerMiddleware } from './middleware/logger.middleware';
 
 /**
  * @Module() 定义一个模块，并管理这个模块的导入集合、控制器集合、提供者集合、导出集合
@@ -32,4 +33,8 @@ import { ErrorsInterceptor } from './modules/common/errors.interceptor';
     exports: [], // 导出当前模块的提供者，用于被其他模块调用
 })
 
-export class AppModule { }
+export class AppModule implements NestModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer.apply(LoggerMiddleware).forRoutes('user');
+    }
+}
