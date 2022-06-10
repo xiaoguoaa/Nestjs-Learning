@@ -1,11 +1,11 @@
 {
     "name": "default",
     "type": "mysql",
-    "host": "localhost",
+    "host": "175.178.94.92",
     "port": 3306,
     "username": "root",
-    "password": "windows@973886860",
-    "database": "todos",
+    "password": "Windows@123",
+    "database": "test",
     "entities": [
         "src/**/**.entity{.ts,.js}"
     ],

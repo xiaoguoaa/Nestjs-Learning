@@ -23,10 +23,6 @@ export class VerificationCodeService {
   ) {}
 
   async getEmailCode(emailObj: { email: string; code: string }) {
-    if (!emailObj.email || !emailObj.code) {
-      throw new HttpException("这些参数必填: email、code", 500);
-    }
-
     const findUser = this.UserRepo.findOne({ email: emailObj.email });
     if (findUser) {
       throw new HttpException("该邮箱已注册，请直接登录", 500);
@@ -75,10 +71,6 @@ export class VerificationCodeService {
   }
 
   async getCode(email: string): Promise<string> {
-    if (!email) {
-      throw new HttpException("这些参数必填: email", 500);
-    }
-
     var captcha = svgCaptcha.create({
       size: 4,
       background: "#5588aa",

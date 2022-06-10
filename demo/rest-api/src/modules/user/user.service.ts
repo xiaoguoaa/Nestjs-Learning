@@ -11,9 +11,6 @@ import { Repository } from "typeorm";
 import { User } from "./user.entity";
 import { VerificationCode } from "src/modules/verification_code/verificationCode.entity";
 
-export class UserAndCode extends User {
-  code?: string;
-}
 @Injectable()
 export class UserService {
   constructor(
@@ -22,13 +19,7 @@ export class UserService {
     private readonly CodeRepo: Repository<VerificationCode> // 使用泛型注入对应类型的存储库实例
   ) {}
 
-  async register(user: UserAndCode): Promise<boolean> {
-    if (!user.nickname || !user.email || !user.code || !user.password) {
-      throw new HttpException(
-        "这些参数必填: nickname、email、code、password",
-        200
-      );
-    }
+  async register(user): Promise<boolean> {
     const findCode = await this.CodeRepo.findOne({ email: user.email });
     if (
       !user.code ||
@@ -52,11 +43,7 @@ export class UserService {
     return true;
   }
 
-  async login(user: User) {
-    if (!user.nickname || !user.password) {
-      throw new HttpException("这些参数必填: nickname、password", 200);
-    }
-
+  async login(user) {
     let findUser = await this.UserRepo.findOne({
       nickname: user.nickname,
       password: user.password,
@@ -68,7 +55,7 @@ export class UserService {
       });
     }
     if (!findUser) {
-      throw new HttpException("账号或密码错误，请重新登录", 200);
+      throw new HttpException("账号或密码错误，请重新登录", 500);
     }
 
     delete findUser.password;
