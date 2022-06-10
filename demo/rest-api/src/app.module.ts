@@ -14,6 +14,7 @@ import { CatModule } from './modules/cat/cat.module';
 import { UserModule } from './modules/user/user.module';
 import { ErrorsInterceptor } from './modules/common/errors.interceptor';
 import { LoggerMiddleware } from './middleware/logger.middleware';
+import { UserController } from './modules/user/user.controller';
 
 /**
  * @Module() 定义一个模块，并管理这个模块的导入集合、控制器集合、提供者集合、导出集合
@@ -35,6 +36,6 @@ import { LoggerMiddleware } from './middleware/logger.middleware';
 
 export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
-        consumer.apply(LoggerMiddleware).forRoutes('user');
+        consumer.apply(LoggerMiddleware).forRoutes(UserController);
     }
 }
