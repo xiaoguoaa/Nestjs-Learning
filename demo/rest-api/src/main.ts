@@ -13,10 +13,9 @@ async function bootstrap() {
 
     // 配置 Swagger
     const options = new DocumentBuilder()
-        .setTitle('Nest zero to one')
-        .setDescription('The nest-zero-to-one API description')
+        .setTitle('swagger 文档')
+        .setDescription('swagger 文档描述')
         .setVersion('1.0')
-        .addTag('test')
         .build();
     const document = SwaggerModule.createDocument(app, options);
     SwaggerModule.setup('api-doc', app, document);

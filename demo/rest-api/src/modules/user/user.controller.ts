@@ -16,12 +16,15 @@ import {
   Query,
   UsePipes
 } from "@nestjs/common";
+import { ApiTags } from '@nestjs/swagger';
 import { GetCodeDTO, GetEmailCodeDTO, RegisterDTO, LoginDTO } from './user.dto';
 
 import { Result } from "../common/result.interface";
 import { User } from "./user.entity";
 import { UserService } from "./user.service";
 import { VerificationCodeService } from "../verification_code/VerificationCode.service";
+
+@ApiTags("用户")
 @Controller("User")
 export class UserController {
   constructor(
