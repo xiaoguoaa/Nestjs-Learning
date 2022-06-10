@@ -1,10 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module';
+import { ValidationPipe } from './pipe/validation.pipe';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);  // 创建应用程序实例，此时所有被 AppModule 导入的其他模块的所有实例都会被加载
-    app.setGlobalPrefix('api');
+    app.setGlobalPrefix('api'); // 全局前缀路由
+    app.useGlobalPipes(new ValidationPipe());
     await app.listen(3000);  // 使用3000端口监听应用程序
 }
 
