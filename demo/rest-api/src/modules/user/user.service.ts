@@ -4,7 +4,7 @@
  * @Author: guowh
  * @Date: 2022-05-24 09:41:01
  */
-import { Injectable, HttpException } from "@nestjs/common";
+import { Injectable, HttpException, HttpStatus } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
@@ -26,7 +26,7 @@ export class UserService {
       !findCode ||
       findCode.emailCode.toLocaleLowerCase() !== user.code.toLocaleLowerCase()
     ) {
-      throw new HttpException("注册验证码错误", 500);
+      throw new HttpException("注册验证码错误", HttpStatus.BAD_REQUEST);
     }
 
     delete user.id;
@@ -34,7 +34,7 @@ export class UserService {
 
     let findUser = await this.UserRepo.findOne({ nickname: user.nickname });
     if (findUser) {
-      throw new HttpException("该昵称已注册，请直接登录", 500);
+      throw new HttpException("该昵称已注册，请直接登录", HttpStatus.BAD_REQUEST);
     }
 
     await this.UserRepo.save(this.UserRepo.create(user));
@@ -55,7 +55,7 @@ export class UserService {
       });
     }
     if (!findUser) {
-      throw new HttpException("账号或密码错误，请重新登录", 500);
+      throw new HttpException("账号或密码错误，请重新登录", HttpStatus.BAD_REQUEST);
     }
 
     delete findUser.password;

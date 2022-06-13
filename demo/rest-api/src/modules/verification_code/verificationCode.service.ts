@@ -4,7 +4,7 @@
  * @Author: guowh
  * @Date: 2022-05-24 09:41:01
  */
-import { Injectable, HttpException } from "@nestjs/common";
+import { Injectable, HttpException, HttpStatus } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import * as svgCaptcha from "svg-captcha";
@@ -25,7 +25,7 @@ export class VerificationCodeService {
   async getEmailCode(emailObj: { email: string; code: string }) {
     const findUser = this.UserRepo.findOne({ email: emailObj.email });
     if (findUser) {
-      throw new HttpException("该邮箱已注册，请直接登录", 500);
+      throw new HttpException("该邮箱已注册，请直接登录", HttpStatus.BAD_REQUEST);
     }
 
     const findCode = await this.CodeRepo.findOne({ email: emailObj.email });
@@ -34,7 +34,7 @@ export class VerificationCodeService {
       !findCode ||
       findCode.code.toLocaleLowerCase() !== emailObj.code.toLocaleLowerCase()
     ) {
-      throw new HttpException("邮箱或验证码错误", 500);
+      throw new HttpException("邮箱或验证码错误", HttpStatus.BAD_REQUEST);
     }
 
     let transporter = nodemailer.createTransport({
@@ -65,7 +65,7 @@ export class VerificationCodeService {
         await this.CodeRepo.save(findCode);
       })
       .catch(() => {
-        throw new HttpException("邮件发送失败", 500);
+        throw new HttpException("邮件发送失败", HttpStatus.BAD_REQUEST);
       });
     return result;
   }
