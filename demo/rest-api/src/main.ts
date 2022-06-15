@@ -9,6 +9,8 @@ async function bootstrap() {
 
     app.setGlobalPrefix('api'); // 全局前缀路由
 
+    app.enableCors(); // 设置cors
+
     app.useGlobalPipes(new ValidationPipe()); // 全局配置管道
 
     // 配置 Swagger
