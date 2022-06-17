@@ -27,8 +27,23 @@ export class VerificationCode {
     code: string;
 
     @Column({
+        name: 'email_code',
         comment: '邮箱验证码',
         nullable: true
     })
     emailCode: string;
+
+    @Column({
+        name: 'create_time',
+        type: 'timestamp',
+        default: () => 'CURRENT_TIMESTAMP'
+    })
+    createTime: Date;
+
+    @Column({
+        name: 'update_time',
+        type: 'timestamp',
+        default: () => 'CURRENT_TIMESTAMP'
+    })
+    updateTime: Date;
 }

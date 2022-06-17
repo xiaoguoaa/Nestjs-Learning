@@ -47,8 +47,8 @@ export class UserController {
 
   @Post("register")
   async register(@Body() user: RegisterDTO): Promise<Result> {
-    await this.UserService.register(user);
-    return { code: 200, message: "注册成功" };
+    const data = await this.UserService.register(user);
+    return { code: 200, message: "注册成功", data };
   }
 
   @Post("login")

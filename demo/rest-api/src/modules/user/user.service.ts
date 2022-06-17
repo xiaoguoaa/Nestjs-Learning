@@ -19,7 +19,7 @@ export class UserService {
     private readonly CodeRepo: Repository<VerificationCode> // 使用泛型注入对应类型的存储库实例
   ) {}
 
-  async register(user): Promise<boolean> {
+  async register(user): Promise<User> {
     const findCode = await this.CodeRepo.findOne({ email: user.email });
     if (
       !user.code ||
@@ -30,17 +30,22 @@ export class UserService {
     }
 
     delete user.id;
-    delete user.code;
 
-    let findUser = await this.UserRepo.findOne({ nickname: user.nickname });
+    const findUser = await this.UserRepo.findOne({ nickname: user.nickname });
     if (findUser) {
       throw new HttpException("该昵称已注册，请直接登录", HttpStatus.BAD_REQUEST);
+    }
+
+    const findUserWithEmail = await this.UserRepo.findOne({ email: user.email });
+    if (findUserWithEmail) {
+      throw new HttpException("该邮箱已注册，请直接登录", HttpStatus.BAD_REQUEST);
     }
 
     await this.UserRepo.save(this.UserRepo.create(user));
     await this.CodeRepo.delete(findCode.id);
 
-    return true;
+    return await this.UserRepo.findOne({where: {nickname: user.nickname}});
+
   }
 
   async login(user) {
